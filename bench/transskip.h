@@ -81,6 +81,10 @@ public:
             return false;
         }
     }
+
+    friend bool operator != (const sl_key_t<cap>& l, const sl_key_t<cap>& r) {
+        return (!l == r);
+    }
     
     friend bool operator<(const sl_key_t<cap>& l, const sl_key_t<cap>& r) {
         assert(l.type != sl_key_type::k_invalid);
