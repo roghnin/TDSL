@@ -3,146 +3,12 @@
 
 
 #include <cstdint>
-#include <iostream>
 #include "common/assert.h"
 #include "common/allocator.h"
 #include "../tskiplist/TSkipList.h"
 
-#define STRING_KV
-
-#ifdef STRING_KV
-
-#ifndef K_SZ
-#define K_SZ 64
-#endif
-
-#ifndef V_SZ
-#define V_SZ 1024
-#endif
-
-enum class sl_key_type {
-    k_valid,
-    k_invalid,
-    k_min,
-    k_max
-};
-
-template <uint64_t cap>
-class sl_key_t {
-    size_t size = 0;
-    char s[cap];
-    sl_key_type type = sl_key_type::k_valid;
-public:
-    sl_key_t<cap>(const std::string& str) : size(str.size()){
-        assert(size<=cap);
-        memcpy(s, str.c_str(), str.size()+1);
-        assert(s[size] == '\0');
-    }
-    sl_key_t<cap>(const sl_key_t<cap>& oth){
-        if (oth.type != sl_key_type::k_valid) {
-            type = oth.type;
-        } else {
-            size = oth.size;
-            assert(size<=cap);
-            memcpy(s, oth.s, size+1);
-            assert(s[size] == '\0');
-        }
-    }
-    sl_key_t<cap>(const uint64_t n) {
-        size = std::sprintf(s, "$d", n);
-    }
-
-    sl_key_t<cap>& operator = (const uint64_t n) {
-        size = std::sprintf(s, "$d", n);
-        return *this;
-    }
-    sl_key_t<cap>& operator = (const std::string& str) {
-        size = str.size();
-        assert(size<=cap);
-        memcpy(s, str.c_str(), str.size()+1);
-        assert(s[size] == '\0');
-        return *this;
-    }
-    sl_key_t<cap>& operator = (const sl_key_type& t) {
-        assert(t != sl_key_type::k_valid);
-        type = t;
-        return *this;
-    }
-
-    friend bool operator == (const sl_key_t<cap>& l, const sl_key_t<cap>& r) {
-        assert(l.type != sl_key_type::k_invalid);
-        assert(r.type != sl_key_type::k_invalid);
-        if (l.type != r.type) {
-            return false;
-        } else if (l.type == sl_key_type::k_valid && 
-            r.type == sl_key_type::k_valid) {
-            return (strcmp(l.s, r.s) == 0);
-        } else {
-            return false;
-        }
-    }
-
-    friend bool operator != (const sl_key_t<cap>& l, const sl_key_t<cap>& r) {
-        return (!l == r);
-    }
-    
-    friend bool operator<(const sl_key_t<cap>& l, const sl_key_t<cap>& r) {
-        assert(l.type != sl_key_type::k_invalid);
-        assert(r.type != sl_key_type::k_invalid);
-        if (l.type == sl_key_type::k_valid &&
-            r.type == sl_key_type::k_valid) {
-            return (strcmp(l.s, r.s) < 0);
-        } else if (l.type == r.type) {
-            return false;
-        } else if (l.type == sl_key_type::k_min ||
-            r.type == sl_key_type::k_max) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-};
-
-template <uint64_t cap>
-class sl_val_t{
-    size_t size;
-    char s[cap];
-public:
-    sl_val_t<cap>(const std::string& str) : size(str.size()){
-        assert(size<=cap);
-        memcpy(s, str.c_str(), str.size()+1);
-        assert(s[size] == '\0');
-    }
-    sl_val_t<cap>(const sl_val_t<cap>& oth){
-        size = oth.size;
-        assert(size<=cap);
-        memcpy(s, oth.s, size+1);
-        assert(s[size] == '\0');
-    }
-    sl_val_t<cap>(const uint64_t n) {
-        size = std::sprintf(s, "$d", n);
-    }
-    sl_val_t<cap>& operator = (const uint64_t n) {
-        size = std::sprintf(s, "$d", n);
-        return *this;
-    }
-    sl_val_t<cap>& operator = (const std::string& str) {
-        size = str.size();
-        assert(size<=cap);
-        memcpy(s, str.c_str(), str.size()+1);
-        assert(s[size] == '\0');
-    }
-};
-
-typedef sl_key_t<K_SZ> setkey_t;
-typedef sl_val_t<V_SZ> setval_t;
-
-#else // STRING_KV
-
-typedef uint64_t setkey_t;
-typedef uint64_t setval_t;
-
-#endif // STRING_KV
+typedef unsigned long setkey_t;
+typedef void         *setval_t;
 
 
 #ifdef __SET_IMPLEMENTATION__
@@ -154,22 +20,6 @@ typedef uint64_t setval_t;
 /* Fine for 2^NUM_LEVELS nodes. */
 #define NUM_LEVELS 20
 
-#ifdef STRING_KV
-
-/* Internal key values with special meanings. */
-#define INVALID_FIELD    sl_key_type::k_invalid   /* Uninitialised field value.     */
-#define SENTINEL_KEYMIN  sl_key_type::k_min       /* Key value of first dummy node. */
-#define SENTINEL_KEYMAX  sl_key_type::k_max       /* Key value of last dummy node.  */
-
-
-/*
- * Used internally be set access functions, so that callers can use
- * key values 0 and 1, without knowing these have special meanings.
- */
-#define CALLER_TO_INTERNAL_KEY(_k) (_k)
-#define INTERNAL_TO_CALLER_KEY(_k) (_k)
-
-#else //STRING_KV
 
 /* Internal key values with special meanings. */
 #define INVALID_FIELD   (0)    /* Uninitialised field value.     */
@@ -184,7 +34,6 @@ typedef uint64_t setval_t;
 #define CALLER_TO_INTERNAL_KEY(_k) ((_k) + 2)
 #define INTERNAL_TO_CALLER_KEY(_k) ((_k) - 2)
 
-#endif //STRING_KV
 
 /*
  * SUPPORT FOR WEAK ORDERING OF MEMORY ACCESSES
@@ -244,14 +93,13 @@ struct NodeDesc
     uint8_t opid;
 };
 
-
 struct node_t
 {
     int        level;
 #define LEVEL_MASK     0x0ff
 #define READY_FOR_FREE 0x100
-    setkey_t k;
-    setval_t v;
+    setkey_t  k;
+    setval_t  v;
 
     NodeDesc* nodeDesc;
 
