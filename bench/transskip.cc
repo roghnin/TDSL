@@ -266,7 +266,7 @@ static inline bool help_ops(SkipList &l, Desc* desc, uint8_t opid)
 
             if(op.type == O_INSERT)
             {
-                ret = l.insert(op.key, t);
+                ret = l.insert(op.key, op.key, t);
             }
             else if(op.type == O_DELETE)
             {

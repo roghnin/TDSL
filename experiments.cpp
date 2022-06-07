@@ -32,8 +32,13 @@ void warmUp(SkipList & sl)
         int percent = (int)((i / float(WARM_UP_NUM_KEYS)) * 100);
 
         SkipListTransaction trans;
+#ifdef STRING_KV
+        ItemType key = std::to_string(distribution(generator));
+#else
+        ItemType key = distribution(generator);
+#endif
         sl.TXBegin(trans);
-        sl.insert(distribution(generator), trans);
+        sl.insert(key, key, trans);
         sl.TXCommit(trans);
     }
 
@@ -83,7 +88,7 @@ void performOp(SkipList * sl, OperationType & opType,
     if (opType == OperationType::CONTAINS) {
         sl->contains(key, trans);
     } else if (opType == OperationType::INSERT) {
-        if (sl->insert(key, trans)) {
+        if (sl->insert(key, key, trans)) {
         }
     } else if (opType == OperationType::REMOVE) {
         sl->remove(key, trans);

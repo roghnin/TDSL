@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include "Utils.h"
 #include "WriteSet.h"
 #include "Node.h"
@@ -32,7 +33,9 @@ public:
 
     bool contains(const ItemType & k, SkipListTransaction & transaction);
 
-    bool insert(const ItemType & k, SkipListTransaction & transaction);
+    std::optional<ValueType> get(const ItemType & k, SkipListTransaction & transaction);
+
+    bool insert(const ItemType & k, const ItemType & v, SkipListTransaction & transaction);
 
     bool remove(const ItemType & k, SkipListTransaction & transaction);
 

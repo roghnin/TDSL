@@ -15,7 +15,19 @@ bool SkipList::contains(const ItemType & k, SkipListTransaction & transaction)
     return (succ != NULL && succ->key == k);
 }
 
-bool SkipList::insert(const ItemType & k, SkipListTransaction & transaction)
+std::optional<ValueType> SkipList::get(const ItemType & k, SkipListTransaction & transaction)
+{
+    Node * pred = NULL, *succ = NULL;
+    traverseTo(k, transaction, pred, succ);
+
+    if (succ != NULL && succ->key == k) {
+        return succ->val;
+    } else {
+        return {};
+    }
+}
+
+bool SkipList::insert(const ItemType & k, const ValueType & v, SkipListTransaction & transaction)
 {
     Node * pred = NULL, *succ = NULL;
     traverseTo(k, transaction, pred, succ);
@@ -24,7 +36,7 @@ bool SkipList::insert(const ItemType & k, SkipListTransaction & transaction)
         return false;
     }
 
-    Node * newNode = new Node(k, transaction.readVersion);
+    Node * newNode = new Node(k, v, transaction.readVersion);
     newNode->next = succ;
 
     transaction.writeSet.addItem(pred, newNode, false);
