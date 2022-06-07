@@ -1,7 +1,15 @@
 #include "Index.h"
 #include "SafeLock.h"
 
+#ifdef STRING_KV
+
+constexpr ItemType MIN_VAL = "";
+
+#else // STRING_KV
+
 constexpr ItemType MIN_VAL = -2147483647;
+
+#endif // STRING_KV
 
 static int NodeCmp(skiplist_node * a, skiplist_node * b, void *)
 {
