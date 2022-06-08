@@ -36,6 +36,8 @@ public:
     std::optional<ValueType> get(const ItemType & k, SkipListTransaction & transaction);
 
     bool insert(const ItemType & k, const ItemType & v, SkipListTransaction & transaction);
+    
+    std::optional<ValueType> put(const ItemType & k, const ValueType & v, SkipListTransaction & transaction);
 
     bool remove(const ItemType & k, SkipListTransaction & transaction);
 

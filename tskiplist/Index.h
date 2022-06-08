@@ -8,7 +8,9 @@ enum OperationType
 {
     REMOVE,
     INSERT,
-    CONTAINS
+    CONTAINS,
+    PUT,
+    GET
 };
 
 class IndexOperation
@@ -34,7 +36,7 @@ public:
     Node * getPrev(const ItemType & k);
 
     // These methods are purely for test-purposes and are not meant to be used by TDSs.
-    long sum();
+    // long sum();
     long size();
 
 private:

@@ -51,13 +51,13 @@ void chooseOps(WorkloadType wtype, uint32_t numOps,
     switch (wtype) {
     case READ_ONLY:
         for (uint32_t i = 0; i < numOps; i++) {
-            outOps.at(i) = OperationType::CONTAINS;
+            outOps.at(i) = OperationType::GET;
         }
         break;
     case UPDATE_ONLY: {
         const uint32_t halfPoint = (uint32_t)(numOps / 2.0);
         for (uint32_t i = 0; i < halfPoint; i++) {
-            outOps.at(i) = OperationType::INSERT;
+            outOps.at(i) = OperationType::PUT;
         }
         for (uint32_t i = halfPoint; i < numOps; i++) {
             outOps.at(i) = OperationType::REMOVE;
@@ -68,13 +68,13 @@ void chooseOps(WorkloadType wtype, uint32_t numOps,
         const uint32_t halfPoint = (uint32_t)(numOps / 2.0);
         const uint32_t threeQuarters = (uint32_t)(numOps * 3.0 / 4.0);
         for (uint32_t i = 0; i < halfPoint; i++) {
-            outOps.at(i) = OperationType::CONTAINS;
+            outOps.at(i) = OperationType::GET;
         }
         for (uint32_t i = halfPoint; i < threeQuarters; i++) {
             outOps.at(i) = OperationType::REMOVE;
         }
         for (uint32_t i = threeQuarters; i < numOps; i++) {
-            outOps.at(i) = OperationType::INSERT;
+            outOps.at(i) = OperationType::PUT;
         }
         break;
     }
@@ -83,7 +83,7 @@ void chooseOps(WorkloadType wtype, uint32_t numOps,
 
 void performOp(SkipList * sl, OperationType & opType,
                SkipListTransaction & trans,
-               int key)
+               ItemType key)
 {
     if (opType == OperationType::CONTAINS) {
         sl->contains(key, trans);
@@ -92,6 +92,10 @@ void performOp(SkipList * sl, OperationType & opType,
         }
     } else if (opType == OperationType::REMOVE) {
         sl->remove(key, trans);
+    } else if (opType == OperationType::GET) {
+        sl->get(key, trans);
+    } else if (opType == OperationType::PUT) {
+        sl->put(key, key, trans);
     }
 }
 
@@ -113,7 +117,11 @@ void worker(SkipList * sl, atomic<uint32_t> * opsCounter,
         sl->TXBegin(trans);
         try {
             for (uint32_t i = 0; i < numOps; i++) {
-                int key = key_distribution(generator);
+#ifdef STRING_KV
+                ItemType key = std::to_string(key_distribution(generator));
+#else
+                ItemType key = key_distribution(generator);
+#endif
                 performOp(sl, ops[i], trans, key);
             }
             sl->TXCommit(trans);

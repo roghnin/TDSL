@@ -3,7 +3,7 @@
 
 #ifdef STRING_KV
 
-constexpr ItemType MIN_VAL = "";
+constexpr char MIN_VAL[] = "";
 
 #else // STRING_KV
 
@@ -71,17 +71,17 @@ Node * Index::getPrev(const ItemType & k)
     return _get_entry(cursor, Node, snode);
 }
 
-long Index::sum()
-{
-    long sum = 0;
-    Node * n = head.next;
-    while (n != NULL) {
-        sum += n->key;
-        n = n->next;
-    }
+// long Index::sum()
+// {
+//     long sum = 0;
+//     Node * n = head.next;
+//     while (n != NULL) {
+//         sum += n->key;
+//         n = n->next;
+//     }
 
-    return sum;
-}
+//     return sum;
+// }
 
 long Index::size()
 {

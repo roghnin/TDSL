@@ -45,6 +45,30 @@ bool SkipList::insert(const ItemType & k, const ValueType & v, SkipListTransacti
     return true;
 }
 
+std::optional<ValueType> SkipList::put(const ItemType & k, const ValueType & v, SkipListTransaction & transaction)
+{
+    std::optional<ValueType> res = {};
+    Node * pred = NULL, *succ = NULL;
+    traverseTo(k, transaction, pred, succ);
+
+    Node * newNode = new Node(k, v, transaction.readVersion);
+    
+    if (succ != NULL && succ->key == k) {
+        res = succ->val;
+        transaction.readSet.push_back(succ);
+        newNode->next = getValidatedValue(transaction, succ);
+        transaction.writeSet.addItem(succ, NULL, true);
+        transaction.writeSet.addItem(pred, newNode, false);
+        transaction.indexTodo.push_back(IndexOperation(succ, OperationType::REMOVE));
+    } else {
+        newNode->next = succ;
+        transaction.writeSet.addItem(pred, newNode, false);
+        transaction.writeSet.addItem(newNode, NULL, false);
+    }
+    transaction.indexTodo.push_back(IndexOperation(newNode, OperationType::INSERT));
+    return res;
+}
+
 bool SkipList::remove(const ItemType & k, SkipListTransaction & transaction)
 {
     Node * pred = NULL, *succ = NULL;

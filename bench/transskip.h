@@ -69,7 +69,7 @@ do {                                                            \
 struct Operator
 {
     uint8_t type;
-    uint32_t key;
+    ItemType key;
 };
 
 struct Desc
