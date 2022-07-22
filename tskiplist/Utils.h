@@ -12,6 +12,9 @@
 typedef std::string ItemType;
 typedef std::string ValueType;
 
+// typedef std::string_view ItemType;
+// typedef std::string_view ValueType;
+
 #else // STRING_KV
 
 typedef int ItemType;

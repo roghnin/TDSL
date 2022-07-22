@@ -22,7 +22,7 @@ unsigned int constexpr MAX_KEY_VAL = 1000000;
 unsigned int constexpr TIMEOUT = 10;
 
 
-void warmUp(SkipList & sl)
+void warmUp(SkipList<ItemType, ValueType> & sl)
 {
     minstd_rand generator;
     uniform_int_distribution<int> distribution(MIN_KEY_VAL, MAX_KEY_VAL);
@@ -31,7 +31,7 @@ void warmUp(SkipList & sl)
     for (auto i = 0; i < WARM_UP_NUM_KEYS; i++) {
         int percent = (int)((i / float(WARM_UP_NUM_KEYS)) * 100);
 
-        SkipListTransaction trans;
+        SkipListTransaction<ItemType, ValueType> trans;
 #ifdef STRING_KV
         ItemType key = std::to_string(distribution(generator));
 #else
@@ -81,8 +81,8 @@ void chooseOps(WorkloadType wtype, uint32_t numOps,
     }
 }
 
-void performOp(SkipList * sl, OperationType & opType,
-               SkipListTransaction & trans,
+void performOp(SkipList<ItemType, ValueType> * sl, OperationType & opType,
+               SkipListTransaction<ItemType, ValueType> & trans,
                ItemType key)
 {
     if (opType == OperationType::CONTAINS) {
@@ -99,7 +99,7 @@ void performOp(SkipList * sl, OperationType & opType,
     }
 }
 
-void worker(SkipList * sl, atomic<uint32_t> * opsCounter,
+void worker(SkipList<ItemType, ValueType> * sl, atomic<uint32_t> * opsCounter,
             atomic<uint32_t> * abortCounter,
             WorkloadType wtype, time_t end)
 {
@@ -113,7 +113,7 @@ void worker(SkipList * sl, atomic<uint32_t> * opsCounter,
         vector<OperationType> ops(numOps);
         chooseOps(wtype, numOps, ops);
 
-        SkipListTransaction trans;
+        SkipListTransaction<ItemType, ValueType> trans;
         sl->TXBegin(trans);
         try {
             for (uint32_t i = 0; i < numOps; i++) {
@@ -145,7 +145,7 @@ int main(int argc, char * argv[])
 
     WorkloadType wtype = (WorkloadType)(atoi(argv[1]));
 
-    SkipList sl;
+    SkipList<ItemType, ValueType> sl;
     warmUp(sl);
 
     uint32_t numThreads = atoi(argv[2]);

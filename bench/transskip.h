@@ -130,15 +130,15 @@ void init_transskip_subsystem(void);
 void destroy_transskip_subsystem(void);
 
 
-bool execute_ops(SkipList &l, Desc* desc);
+bool execute_ops(SkipList<ItemType, ValueType> &l, Desc* desc);
 
 /*
  * Allocate an empty set.
  */
 trans_skip *transskip_alloc(Allocator<Desc>* _descAllocator, Allocator<NodeDesc>* _nodeDescAllocator);
 
-void  transskip_free(SkipList &l);
+void  transskip_free(SkipList<ItemType, ValueType> &l);
 
-void ResetMetrics(SkipList &l);
+void ResetMetrics(SkipList<ItemType, ValueType> &l);
 
 #endif /* __SET_H__ */

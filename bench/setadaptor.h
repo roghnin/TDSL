@@ -74,7 +74,7 @@ public:
 private:
     Allocator<Desc> m_descAllocator;
     Allocator<NodeDesc> m_nodeDescAllocator;
-    SkipList m_skiplist;
+    SkipList<ItemType, ValueType> m_skiplist;
 };
 
 #endif /* end of include guard: SETADAPTOR_H */
