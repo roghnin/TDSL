@@ -7,6 +7,8 @@
 #include "Utils.h"
 #include "skiplist/skiplist.h"
 
+namespace tdsl{
+
 enum OperationType
 {
     REMOVE,
@@ -111,3 +113,5 @@ private:
     Node<K,V> head;
     skiplist_raw sl;
 };
+
+}

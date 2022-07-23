@@ -22,7 +22,7 @@ unsigned int constexpr MAX_KEY_VAL = 1000000;
 unsigned int constexpr TIMEOUT = 10;
 
 
-void warmUp(SkipList<ItemType, ValueType> & sl)
+void warmUp(tdsl::SkipList<ItemType, ValueType> & sl)
 {
     minstd_rand generator;
     uniform_int_distribution<int> distribution(MIN_KEY_VAL, MAX_KEY_VAL);
@@ -31,7 +31,7 @@ void warmUp(SkipList<ItemType, ValueType> & sl)
     for (auto i = 0; i < WARM_UP_NUM_KEYS; i++) {
         int percent = (int)((i / float(WARM_UP_NUM_KEYS)) * 100);
 
-        SkipListTransaction<ItemType, ValueType> trans;
+        tdsl::SkipListTransaction<ItemType, ValueType> trans;
 #ifdef STRING_KV
         ItemType key = std::to_string(distribution(generator));
 #else
@@ -46,21 +46,21 @@ void warmUp(SkipList<ItemType, ValueType> & sl)
 }
 
 void chooseOps(WorkloadType wtype, uint32_t numOps,
-               vector<OperationType> & outOps)
+               vector<tdsl::OperationType> & outOps)
 {
     switch (wtype) {
     case READ_ONLY:
         for (uint32_t i = 0; i < numOps; i++) {
-            outOps.at(i) = OperationType::GET;
+            outOps.at(i) = tdsl::OperationType::GET;
         }
         break;
     case UPDATE_ONLY: {
         const uint32_t halfPoint = (uint32_t)(numOps / 2.0);
         for (uint32_t i = 0; i < halfPoint; i++) {
-            outOps.at(i) = OperationType::PUT;
+            outOps.at(i) = tdsl::OperationType::PUT;
         }
         for (uint32_t i = halfPoint; i < numOps; i++) {
-            outOps.at(i) = OperationType::REMOVE;
+            outOps.at(i) = tdsl::OperationType::REMOVE;
         }
         break;
     }
@@ -68,38 +68,38 @@ void chooseOps(WorkloadType wtype, uint32_t numOps,
         const uint32_t halfPoint = (uint32_t)(numOps / 2.0);
         const uint32_t threeQuarters = (uint32_t)(numOps * 3.0 / 4.0);
         for (uint32_t i = 0; i < halfPoint; i++) {
-            outOps.at(i) = OperationType::GET;
+            outOps.at(i) = tdsl::OperationType::GET;
         }
         for (uint32_t i = halfPoint; i < threeQuarters; i++) {
-            outOps.at(i) = OperationType::REMOVE;
+            outOps.at(i) = tdsl::OperationType::REMOVE;
         }
         for (uint32_t i = threeQuarters; i < numOps; i++) {
-            outOps.at(i) = OperationType::PUT;
+            outOps.at(i) = tdsl::OperationType::PUT;
         }
         break;
     }
     }
 }
 
-void performOp(SkipList<ItemType, ValueType> * sl, OperationType & opType,
-               SkipListTransaction<ItemType, ValueType> & trans,
+void performOp(tdsl::SkipList<ItemType, ValueType> * sl, tdsl::OperationType & opType,
+               tdsl::SkipListTransaction<ItemType, ValueType> & trans,
                ItemType key)
 {
-    if (opType == OperationType::CONTAINS) {
+    if (opType == tdsl::OperationType::CONTAINS) {
         sl->contains(key, trans);
-    } else if (opType == OperationType::INSERT) {
+    } else if (opType == tdsl::OperationType::INSERT) {
         if (sl->insert(key, key, trans)) {
         }
-    } else if (opType == OperationType::REMOVE) {
+    } else if (opType == tdsl::OperationType::REMOVE) {
         sl->remove(key, trans);
-    } else if (opType == OperationType::GET) {
+    } else if (opType == tdsl::OperationType::GET) {
         sl->get(key, trans);
-    } else if (opType == OperationType::PUT) {
+    } else if (opType == tdsl::OperationType::PUT) {
         sl->put(key, key, trans);
     }
 }
 
-void worker(SkipList<ItemType, ValueType> * sl, atomic<uint32_t> * opsCounter,
+void worker(tdsl::SkipList<ItemType, ValueType> * sl, atomic<uint32_t> * opsCounter,
             atomic<uint32_t> * abortCounter,
             WorkloadType wtype, time_t end)
 {
@@ -110,10 +110,10 @@ void worker(SkipList<ItemType, ValueType> * sl, atomic<uint32_t> * opsCounter,
     while (time(NULL) < end) {
         int numOps = transaction_distribution(generator);
 
-        vector<OperationType> ops(numOps);
+        vector<tdsl::OperationType> ops(numOps);
         chooseOps(wtype, numOps, ops);
 
-        SkipListTransaction<ItemType, ValueType> trans;
+        tdsl::SkipListTransaction<ItemType, ValueType> trans;
         sl->TXBegin(trans);
         try {
             for (uint32_t i = 0; i < numOps; i++) {
@@ -145,7 +145,7 @@ int main(int argc, char * argv[])
 
     WorkloadType wtype = (WorkloadType)(atoi(argv[1]));
 
-    SkipList<ItemType, ValueType> sl;
+    tdsl::SkipList<ItemType, ValueType> sl;
     warmUp(sl);
 
     uint32_t numThreads = atoi(argv[2]);

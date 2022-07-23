@@ -2,6 +2,8 @@
 
 #include "Utils.h"
 
+namespace tdsl{
+
 class SafeLock
 {
 public:
@@ -40,3 +42,5 @@ public:
 private:
     std::vector<Mutex *> locks;
 };
+
+}

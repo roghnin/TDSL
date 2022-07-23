@@ -4,6 +4,8 @@
 #include "Mutex.h"
 #include "skiplist/skiplist.h"
 
+namespace tdsl{
+
 enum NodeType{MIN, NORMAL};
 
 template<typename K, typename V>
@@ -38,3 +40,5 @@ public:
     Mutex lock;
     unsigned int version;
 };
+
+} // namespace tdsl

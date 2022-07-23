@@ -2,6 +2,8 @@
 
 #include "Utils.h"
 
+namespace tdsl {
+
 class Mutex
 {
 public:
@@ -35,3 +37,5 @@ private:
     std::recursive_mutex mutex;
     bool locked;
 };
+
+} // namespace tdsl

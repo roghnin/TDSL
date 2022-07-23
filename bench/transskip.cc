@@ -236,7 +236,7 @@ void destroy_transskip_subsystem(void)
     fr_destroy_gc_subsystem();
 }
 
-static inline bool help_ops(SkipList<ItemType, ValueType> &l, Desc* desc, uint8_t opid)
+static inline bool help_ops(tdsl::SkipList<ItemType, ValueType> &l, Desc* desc, uint8_t opid)
 {
     bool ret = true;
     // For less than 1 million nodes, it is faster not to delete nodes
@@ -253,7 +253,7 @@ static inline bool help_ops(SkipList<ItemType, ValueType> &l, Desc* desc, uint8_
         }
         return false;
     }
-    SkipListTransaction<ItemType, ValueType> t;
+    tdsl::SkipListTransaction<ItemType, ValueType> t;
 
     helpStack.Push(desc);
     try {
@@ -291,7 +291,7 @@ static inline bool help_ops(SkipList<ItemType, ValueType> &l, Desc* desc, uint8_
 }
 
 
-bool execute_ops(SkipList<ItemType, ValueType> &l, Desc* desc)
+bool execute_ops(tdsl::SkipList<ItemType, ValueType> &l, Desc* desc)
 {
     helpStack.Init();
 
@@ -311,14 +311,14 @@ void transskip_print(trans_skip* l)
     }
 }
 
-void transskip_free(SkipList<ItemType, ValueType> &l)
+void transskip_free(tdsl::SkipList<ItemType, ValueType> &l)
 {
     printf("Total commits: %u\nTotal aborts: %u\nTotal fakes: %u\n", g_count_commit, g_count_abort, g_count_fake_abort);
 
     //transskip_print(l);
 }
 
-void ResetMetrics(SkipList<ItemType, ValueType> &l)
+void ResetMetrics(tdsl::SkipList<ItemType, ValueType> &l)
 {
     g_count_commit = 0;
     g_count_abort = 0;

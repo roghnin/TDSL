@@ -7,6 +7,8 @@
 #include "GVC.h"
 #include "Index.h"
 
+namespace tdsl {
+
 template<typename K, typename V>
 class SkipListTransaction
 {
@@ -181,3 +183,6 @@ public:
     GVC gvc;
     Index<K,V> index;
 };
+
+    
+} // namespace tdsl

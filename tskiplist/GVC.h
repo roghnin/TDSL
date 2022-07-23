@@ -2,6 +2,8 @@
 
 #include "Utils.h"
 
+namespace tdsl {
+
 class GVC
 {
 public:
@@ -22,3 +24,5 @@ public:
 private:
     std::atomic<unsigned int> version;
 };
+
+}

@@ -4,6 +4,8 @@
 #include "Node.h"
 #include "SafeLock.h"
 
+namespace tdsl {
+
 template<typename K, typename V>
 class Operation
 {
@@ -84,3 +86,5 @@ public:
 private:
     std::unordered_map<Node<K,V> *, Operation<K,V>> items;
 };
+
+} // namespace tdsl

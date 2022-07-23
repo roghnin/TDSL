@@ -74,7 +74,7 @@ public:
 private:
     Allocator<Desc> m_descAllocator;
     Allocator<NodeDesc> m_nodeDescAllocator;
-    SkipList<ItemType, ValueType> m_skiplist;
+    tdsl::SkipList<ItemType, ValueType> m_skiplist;
 };
 
 #endif /* end of include guard: SETADAPTOR_H */
