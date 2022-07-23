@@ -93,20 +93,25 @@ public:
         return res;
     }
 
-    bool remove(const K & k, SkipListTransaction<K,V> & transaction){
+    std::optional<V> remove_return(const K & k, SkipListTransaction<K,V> & transaction){
         Node<K,V> * pred = NULL, *succ = NULL;
+        std::optional<V> res = {};
         traverseTo(k, transaction, pred, succ);
-
+        
         if (succ == NULL || succ->key != k) {
-            return false;
+            return res;
         }
-
+        res = succ->val;
         transaction.readSet.push_back(succ);
 
         transaction.writeSet.addItem(pred, getValidatedValue(transaction, succ), false);
         transaction.writeSet.addItem(succ, NULL, true);
         transaction.indexTodo.push_back(IndexOperation(succ, OperationType::REMOVE));
-        return true;
+        return res;
+    }
+
+    bool remove(const K & k, SkipListTransaction<K,V> & transaction) {
+        return (remove_return(k, transaction).has_value());
     }
 
     Node<K,V> * getValidatedValue(SkipListTransaction<K,V> & transaction, Node<K,V> * node,
